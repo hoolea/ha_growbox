@@ -1,6 +1,8 @@
 # 🌱 Growbox Automation for Home Assistant
 
 <img width="1024" height="1536" alt="growbox" src="https://github.com/user-attachments/assets/78788b3f-3562-455b-8f1e-a800064a2aa0" />
+<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/079997df-0623-4954-bc9c-1f348d6fcea5" />
+
 
 ---
 
