@@ -1,0 +1,80 @@
+alias: "Гроубокс: Управление подогревом"
+description: Управляет подогревом с разными температурами днем и ночью
+triggers:
+  - trigger: numeric_state
+    entity_id: sensor.datchik_temperatury_grouboks_temperature
+    below: 26
+    id: day_heat_on
+  - trigger: numeric_state
+    entity_id: sensor.datchik_temperatury_grouboks_temperature
+    above: 27
+    id: day_heat_off
+  - trigger: numeric_state
+    entity_id: sensor.datchik_temperatury_grouboks_temperature
+    below: 22
+    id: night_heat_on
+  - trigger: numeric_state
+    entity_id: sensor.datchik_temperatury_grouboks_temperature
+    above: 23
+    id: night_heat_off
+  - trigger: state
+    entity_id:
+      - switch.rele_grouboks_l2
+    id: rozetka_change
+conditions:
+  - condition: not
+    conditions:
+      - condition: state
+        entity_id: sensor.datchik_temperatury_grouboks_temperature
+        state: unavailable
+actions:
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: switch.rele_grouboks_l2
+            state: "on"
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: numeric_state
+                    entity_id: sensor.datchik_temperatury_grouboks_temperature
+                    below: 26
+                sequence:
+                  - action: switch.turn_on
+                    target:
+                      entity_id: switch.rele_grouboks_l3
+                    data: {}
+              - conditions:
+                  - condition: numeric_state
+                    entity_id: sensor.datchik_temperatury_grouboks_temperature
+                    above: 27
+                sequence:
+                  - action: switch.turn_off
+                    target:
+                      entity_id: switch.rele_grouboks_l3
+                    data: {}
+      - conditions:
+          - condition: state
+            entity_id: switch.rele_grouboks_l2
+            state: "off"
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: numeric_state
+                    entity_id: sensor.datchik_temperatury_grouboks_temperature
+                    below: 22
+                sequence:
+                  - action: switch.turn_on
+                    target:
+                      entity_id: switch.rele_grouboks_l3
+                    data: {}
+              - conditions:
+                  - condition: numeric_state
+                    entity_id: sensor.datchik_temperatury_grouboks_temperature
+                    above: 23
+                sequence:
+                  - action: switch.turn_off
+                    target:
+                      entity_id: switch.rele_grouboks_l3
+                    data: {}
+mode: restart

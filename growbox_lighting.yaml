@@ -1,0 +1,30 @@
+alias: "Гроубокс: Управление светом"
+description: Включает и выключает свет по расписанию
+triggers:
+  - at: "09:00:00"
+    id: light_on
+    trigger: time
+  - at: "00:00:00"
+    id: light_off
+    trigger: time
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: light_on
+        sequence:
+          - target:
+              entity_id:
+                - switch.rele_grouboks_l2
+            action: switch.turn_on
+            data: {}
+      - conditions:
+          - condition: trigger
+            id: light_off
+        sequence:
+          - target:
+              entity_id:
+                - switch.rele_grouboks_l2
+            action: switch.turn_off
+            data: {}
+mode: single

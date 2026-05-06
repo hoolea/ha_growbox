@@ -1,0 +1,33 @@
+alias: "Гроубокс: Управление охлаждением"
+description: Включает охлаждение при 29°C и выключает при 28°C
+triggers:
+  - entity_id:
+      - sensor.datchik_temperatury_grouboks_temperature
+    above: 29
+    id: cooling_on
+    trigger: numeric_state
+  - entity_id:
+      - sensor.datchik_temperatury_grouboks_temperature
+    below: 28
+    id: cooling_off
+    trigger: numeric_state
+conditions: []
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: cooling_on
+        sequence:
+          - action: switch.turn_on
+            data: {}
+            target:
+              entity_id: switch.rele_grouboks_l1
+      - conditions:
+          - condition: trigger
+            id: cooling_off
+        sequence:
+          - action: switch.turn_off
+            data: {}
+            target:
+              entity_id: switch.rele_grouboks_l1
+mode: single

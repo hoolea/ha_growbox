@@ -1,0 +1,102 @@
+alias: "Гроубокс: Управление поливом"
+description: Автоматизация полива на основе влажности почвы с уведомлениями
+triggers:
+  - entity_id: sensor.0xa4c1388a2836cbfc_soil_moisture
+    for:
+      minutes: 5
+    trigger: state
+conditions:
+  - condition: and
+    conditions:
+      - condition: state
+        entity_id: switch.poliv_switch_1
+        state: "off"
+      - condition: numeric_state
+        entity_id: sensor.0xa4c1388a2836cbfc_soil_moisture
+        below: 60
+      - condition: template
+        value_template: >-
+          {{ not is_state('sensor.0xa4c1388a2836cbfc_soil_moisture',
+          'unavailable') and
+             not is_state('sensor.0xa4c1388a2836cbfc_soil_moisture', 'unknown') and
+             states('sensor.0xa4c1388a2836cbfc_soil_moisture') | float(default=0) > 0 }}
+actions:
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: switch.poliv_switch_1
+            state: unavailable
+        sequence:
+          - data:
+              message: 🚨 Ошибка! Поливной переключатель недоступен!
+            action: notify.telegram_notifier
+          - stop: Прекращаем выполнение, так как полив недоступен
+    default:
+      - data:
+          message: 🌱 Влажность почвы низкая (<60%). Начинаю полив.
+        action: notify.telegram_notifier
+      - action: switch.turn_on
+        data: {}
+        target:
+          entity_id: switch.unknown_switch_1
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 15
+          milliseconds: 0
+      - target:
+          entity_id:
+            - switch.unknown_switch_1
+        action: switch.turn_off
+        data: {}
+      - data:
+          message: 💧 Полив завершен. Проверяю влажность через 45 минут.
+        action: notify.telegram_notifier
+      - delay:
+          minutes: 45
+      - if:
+          - condition: and
+            conditions:
+              - condition: template
+                value_template: "{{ not is_state('switch.poliv_switch_1', 'unavailable') }}"
+              - condition: numeric_state
+                entity_id: sensor.0xa4c1388a2836cbfc_soil_moisture
+                below: 60
+              - condition: template
+                value_template: >-
+                  {{ not is_state('sensor.0xa4c1388a2836cbfc_soil_moisture',
+                  'unavailable') and
+                     not is_state('sensor.0xa4c1388a2836cbfc_soil_moisture', 'unknown') and
+                     states('sensor.0xa4c1388a2836cbfc_soil_moisture') | float(default=0) > 0 }}
+        then:
+          - data:
+              message: ⚠️ Влажность почвы все еще низкая (<60%). Повторный полив.
+            action: notify.telegram_notifier
+          - target:
+              entity_id:
+                - switch.unknown_switch_1
+            action: switch.turn_on
+            data: {}
+          - delay:
+              seconds: 5
+          - target:
+              entity_id:
+                - switch.unknown_switch_1
+            action: switch.turn_off
+            data: {}
+          - data:
+              message: 💧 Повторный полив завершен.
+            action: notify.telegram_notifier
+        else:
+          - data:
+              message: ✅ Влажность почвы в норме (>=60%).
+            action: notify.telegram_notifier
+  - if:
+      - condition: state
+        entity_id: sensor.0xa4c1388a2836cbfc_soil_moisture
+        state: unavailable
+    then:
+      - data:
+          message: 🚨 Ошибка! Датчик влажности недоступен!
+        action: notify.telegram_notifier
+mode: restart

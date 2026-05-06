@@ -1,0 +1,109 @@
+type: vertical-stack
+cards:
+  - type: picture
+    image: /api/image/serve/4dd51e5107f826befe480471f5f3f1a7/512x512
+
+  - type: grid
+    square: false
+    cards:
+      - type: horizontal-stack
+        cards:
+          - type: custom:mushroom-template-card
+            primary: |
+              {{ states('sensor.datchik_temperatury_grouboks_temperature') }} °C
+            icon: mdi:temperature-celsius
+            icon_color: >
+              {% if states('sensor.datchik_temperatury_grouboks_temperature') | int >= 25 %}
+                green
+              {% elif states('sensor.datchik_temperatury_grouboks_temperature') | int >= 24 %}
+                yellow
+              {% else %}
+                red
+              {% endif %}
+            layout: vertical
+            tap_action:
+              action: none
+
+          - type: custom:mushroom-template-card
+            primary: |
+              {{ states('sensor.datchik_temperatury_grouboks_humidity') }} %
+            icon: mdi:thermometer-water
+            icon_color: >
+              {% if states('sensor.datchik_temperatury_grouboks_humidity') | int >= 55 %}
+                green
+              {% elif states('sensor.datchik_temperatury_grouboks_humidity') | int >= 50 %}
+                yellow
+              {% elif states('sensor.datchik_temperatury_grouboks_humidity') | int >= 45 %}
+                orange
+              {% else %}
+                red
+              {% endif %}
+            layout: vertical
+            tap_action:
+              action: none
+
+          - type: custom:mushroom-template-card
+            primary: |
+              {{ states('sensor.0xa4c1388a2836cbfc_soil_moisture') }} %
+            icon: mdi:watering-can
+            icon_color: >
+              {% if states('sensor.0xa4c1388a2836cbfc_soil_moisture') | int >= 60 %}
+                green
+              {% elif states('sensor.0xa4c1388a2836cbfc_soil_moisture') | int >= 45 %}
+                yellow
+              {% elif states('sensor.0xa4c1388a2836cbfc_soil_moisture') | int >= 40 %}
+                orange
+              {% else %}
+                red
+              {% endif %}
+            layout: vertical
+            tap_action:
+              action: none
+
+          - type: custom:mushroom-template-card
+            primary: |
+              {{ states('sensor.0xa4c1388a2836cbfc_battery') }} %
+            icon: mdi:battery
+            icon_color: >
+              {% if states('sensor.0xa4c1388a2836cbfc_battery') | int >= 70 %}
+                green
+              {% elif states('sensor.0xa4c1388a2836cbfc_battery') | int >= 50 %}
+                yellow
+              {% elif states('sensor.0xa4c1388a2836cbfc_battery') | int >= 30 %}
+                orange
+              {% else %}
+                red
+              {% endif %}
+            layout: vertical
+            tap_action:
+              action: none
+    columns: 1
+  - type: entities
+    entities:
+      - entity: switch.grouboks_rele_l1
+        name: "Гроубокс: Охлаждение"
+        icon: mdi:air-conditioner
+      - entity: switch.grouboks_rele_l2
+        name: "Гроубокс: Лампа"
+        icon: mdi:ceiling-light
+      - entity: switch.grouboks_rele_l3
+        name: "Гроубокс: Подогрев"
+        icon: mdi:home-thermometer-outline
+      - entity: switch.grouboks_rele_l4
+        name: "Гроубокс: Подогрев воды"
+        icon: mdi:hydro-power
+      - entity: switch.unknown_switch_1
+        name: "Гроубокс: Полив 1"
+        icon: mdi:water
+      - entity: switch.unknown_switch_2
+        name: "Гроубокс: Полив 2"
+        icon: mdi:water
+    show_header_toggle: false
+    title: Устройства
+  - type: entities
+    entities:
+      - entity: automation.grouboks_poliv_10_00
+      - entity: automation.grouboks_okhlazhdenie
+      - entity: automation.grouboks_svet
+    show_header_toggle: false
+    title: Автоматизации
